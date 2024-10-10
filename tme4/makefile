@@ -14,24 +14,22 @@ DEP_SHIFTER:=shifter.vhdl
 SRC_SHIFTER:=shifter_tb.vhdl
 
 CC:=ghdl
-CFLAGS:=-e -v  --std=08
-
-BFLAGS:=-a -v --std=08
+FLAGS:= -v -fsynopsys --std=08
+EFLAGS:=-e 
+AFLAGS:=-a
+RFLAGS:=-r
 
 all: $(TARGET_ALU) $(TARGET_ADDER) $(TARGET_SHIFTER)
-
-
-
 
 $(TARGET_ALU): $(SRC_ALU)
 	$(CC) $(CFLAGS) $(DEP_ALU)
 	$(CC) $(CFLAGS) $(SRC_ALU)
 
 $(TARGET_ADDER): $(SRC_ADDER)
-	$(CC) $(BFLAGS) $(DEP_ADDER)
-	$(CC) $(BFLAGS) $(SRC_ADDER)
-	$(CC) $(CFLAGS) adder32b_tb
-
+	$(CC) $(AFLAGS) $(FLAGS)  $(DEP_ADDER)
+	$(CC) $(AFLAGS) $(FLAGS)  $(SRC_ADDER)
+	$(CC) $(EFLAGS) $(FLAGS)  $(SRC_ADDER)	
+	$(CC) $(RFLAGS) $(FLAGS)  adder32b_tb
 
 $(TARGET_SHIFTER): $(SRC_SHIFTER)
 	$(CC) $(BFLAGS) $(DEP_SHIFTER)

@@ -3,7 +3,7 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
-
+use IEEE.STD_LOGIC_unsigned.all;
 
 ENTITY adder32bit is 
 	port( 
@@ -16,13 +16,17 @@ ENTITY adder32bit is
     	 );
 END ENTITY; 
 
-architecture structure2 of adder32bit is 
 
-signal total : std_logic_vector(31 downto 0);
+architecture behavioural of adder32bit is
 
-begin  
-	total <= std_logic_vector( unsigned(A) + unsigned(B) + unsigned'('0'&cin) );
-	Q <= total(31 downto 0);
-	cout <= (A(31) and B(31) and not total(31)) or (not A(31) and not B(31) and total(31));
+	signal temp : std_logic_vector(32 downto 0);
 
-end structure2; 
+	begin
+	 process(a,b,cin)
+	 begin
+	  temp <= std_logic_vector(unsigned("0" & A) + unsigned("0" & B) + unsigned'(""&cin) ) ;
+	 end process;
+	 q  <= temp(31 downto 0);
+	 cout   <= temp(32);
+end behavioural;
+
