@@ -24,9 +24,13 @@ architecture behavioural of adder32bit is
 	begin
 	 process(a,b,cin)
 	 begin
+
 	  temp <= std_logic_vector(unsigned("0" & A) + unsigned("0" & B) + unsigned'(""&cin) ) ;
+
 	 end process;
+
 	 q  <= temp(31 downto 0);
 	 cout   <= temp(32);
+	 
 end behavioural;
 
