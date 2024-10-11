@@ -27,7 +27,6 @@ architecture structure of adder32b_tb is
 process 
 
 variable qv : std_logic_vector(32 downto 0);
-variable coutv : std_logic;
 variable ca : std_logic_vector(31 downto 0);
 variable cb : std_logic_vector(31 downto 0);
 variable cc : std_logic_vector(1 downto 0);
@@ -54,21 +53,18 @@ La: for va in 0 to 1000 loop
 			a<= ca;
 			b<= cb;
 			cin<= cc(0);
-
 			
 			qv:= std_logic_vector(unsigned("0" & ca) + unsigned("0" & cb) + unsigned'(""&cc(0)) ) ;
 				   
 			wait for 1 ns; 		
-			 assert  qv(31 downto 0)=q report "q is " & integer'image(to_integer(unsigned(q))) & " qv is "
-			  & integer'image(to_integer(unsigned(qv(31 downto 0)))) severity error;
+			assert  qv(31 downto 0)=q report "q is " & integer'image(to_integer(unsigned(q))) & " qv is "
+			  		& integer'image(to_integer(unsigned(qv(31 downto 0)))) severity error;
 		
-			 assert cout=qv(32) report "erreur cout" severity error; 	
+			assert cout=qv(32) report "erreur cout" severity error; 	
 
-	
 end loop La; 
 
 	
-
 assert false report  "end of test" severity error; 	
 wait; 
 end process; 

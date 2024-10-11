@@ -18,19 +18,15 @@ END ENTITY;
 
 
 architecture behavioural of adder32bit is
-
+	
 	signal temp : std_logic_vector(32 downto 0);
-
 	begin
-	 process(a,b,cin)
-	 begin
+		process(a,b,cin)
+		begin
+			temp <= std_logic_vector(unsigned("0" & A) + unsigned("0" & B) + unsigned'(""&cin) ) ;
+		end process;
 
-	  temp <= std_logic_vector(unsigned("0" & A) + unsigned("0" & B) + unsigned'(""&cin) ) ;
+		q  <= temp(31 downto 0);
+		cout   <= temp(32);
 
-	 end process;
-
-	 q  <= temp(31 downto 0);
-	 cout   <= temp(32);
-	 
 end behavioural;
-

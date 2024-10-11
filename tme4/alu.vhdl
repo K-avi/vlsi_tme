@@ -18,33 +18,43 @@ end Alu;
 
 architecture structure of Alu is 
 
-	component adder4bit -- a remplacer par adder 32 bit
+	component adder32bit -- a remplacer par adder 32 bit
 		port(
-			A : in Std_Logic_Vector(3 downto 0);
-			B : in Std_Logic_Vector(3 downto 0);
+			A : in Std_Logic_Vector(31 downto 0);
+			B : in Std_Logic_Vector(31 downto 0);
 			cin : in Std_Logic;
 			cout : out Std_Logic;
-			Q : out Std_Logic_Vector(3 downto 0)
+			Q : out Std_Logic_Vector(31 downto 0)
 		);
 	end component;
-	signal resOp,resAdd : Std_Logic_Vector(31 downto 0);
+	signal resAdd : Std_Logic_Vector(31 downto 0);
 
 begin
-	
-	resOp <= resAdd when cmd = "00" else
-		op1 and op2 when cmd = "01" else
-		op1 or op2 when cmd = "10" else
-		op1 xor op2 when cmd = "11";
-	
-	--zero flag
-	z <= '1' when not resOp = "00000000000000000000000000000000" else '0'; 
-	--negative flag
-	n <= resOp(31);
-	--overflow flag
-	v <= '1' when cmd = "00" and (resAdd < op1 or resAdd < op2) else '0';
-	cout <= v;
 
-	res <= resOp;
+	adder32bit_0: adder32bit
+	port map(
+		A => op1,
+		B => op2,
+		cin => cin,
+		cout => cout,
+		Q => resAdd
+	);
+	process(op1,op2,cmd,resAdd)
+  	begin
+	
+		res <= resAdd when cmd = "00" else
+			op1 and op2 when cmd = "01" else
+			op1 or op2 when cmd = "10" else
+			op1 xor op2 when cmd = "11";
+	end process;
+
+	--zero flag
+	z <= '1' when not res = "00000000000000000000000000000000" else '0'; 
+	--negative flag
+	n <= res(31);
+	--overflow flag
+	v <= cout when cmd = "00" else '0';
+	
 
 end structure;
 
