@@ -35,8 +35,10 @@ $(TARGET_ADDER): $(SRC_ADDER)
 	$(CC) $(RFLAGS) $(FLAGS)  adder32b_tb
 
 $(TARGET_SHIFTER): $(SRC_SHIFTER)
-	$(CC) $(BFLAGS) $(DEP_SHIFTER)
-	$(CC) $(BFLAGS) $(SRC_SHIFTER)
+	$(CC) $(AFLAGS) $(FLAGS)  $(DEP_SHIFTER)
+	$(CC) $(AFLAGS) $(FLAGS)  $(SRC_SHIFTER)
+	$(CC) $(EFLAGS) $(FLAGS)  $(SRC_SHIFTER)	
+	$(CC) $(RFLAGS) $(FLAGS)  shifter_tb
 
 clean:
 	rm -f *.cf *.o $(TARGET_ALU) $(TARGET_ADDER) $(TARGET_SHIFTER)

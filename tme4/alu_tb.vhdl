@@ -11,17 +11,18 @@ architecture structure of alu_tb is
 
 
     component alu
-    port ( op1 : in Std_Logic_Vector(31 downto 0);
-	op2 : in Std_Logic_Vector(31 downto 0);
-	cin : in Std_Logic;
-	cmd : in Std_Logic_Vector(1 downto 0);
-	res : out Std_Logic_Vector(31 downto 0);
-	cout : out Std_Logic;
-	z : out Std_Logic;
-	n : out Std_Logic;
-	v : out Std_Logic;
-	vdd : in bit;
-	vss : in bit);
+      port (  op1 : in Std_Logic_Vector(31 downto 0);
+              op2 : in Std_Logic_Vector(31 downto 0);
+              cin : in Std_Logic;
+              cmd : in Std_Logic_Vector(1 downto 0);
+              res : out Std_Logic_Vector(31 downto 0);
+              cout : out Std_Logic;
+              z : out Std_Logic;
+              n : out Std_Logic;
+              v : out Std_Logic;
+              vdd : in bit;
+              vss : in bit
+      );
     end component;
 
     signal op1,op2 : Std_Logic_Vector(31 downto 0);
