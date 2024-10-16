@@ -20,51 +20,63 @@ entity exec is
 			dec_mem_dest	: in Std_Logic_Vector(3 downto 0); -- Destination MEM R
 			dec_pre_index 	: in Std_logic;
 
+			-- Read in fifo 
 			dec_mem_lw		: in Std_Logic;
 			dec_mem_lb		: in Std_Logic;
 			dec_mem_sw		: in Std_Logic;
 			dec_mem_sb		: in Std_Logic;
 
 	-- Shifter command
+
+			-- passed to shifter 
 			dec_shift_lsl	: in Std_Logic;
 			dec_shift_lsr	: in Std_Logic;
 			dec_shift_asr	: in Std_Logic;
 			dec_shift_ror	: in Std_Logic;
 			dec_shift_rrx	: in Std_Logic;
 			dec_shift_val	: in Std_Logic_Vector(4 downto 0);
+			-- carry passed to shifter
 			dec_cy			: in Std_Logic;
 
 	-- Alu operand selection
+
+			-- used before alu to select negation or op 1
 			dec_comp_op1	: in Std_Logic;
 			dec_comp_op2	: in Std_Logic;
+			-- carry passed to alu
 			dec_alu_cy 		: in Std_Logic;
 
 	-- Alu command
 			dec_alu_cmd		: in Std_Logic_Vector(1 downto 0);
 
 	-- Exe bypass to decod
-			exe_res			: out Std_Logic_Vector(31 downto 0);
+			exe_res			: out Std_Logic_Vector(31 downto 0); --mapped to alu_res
 
-			exe_c			: out Std_Logic;
-			exe_v			: out Std_Logic;
-			exe_n			: out Std_Logic;
-			exe_z			: out Std_Logic;
+			exe_c			: out Std_Logic; --the carry out is the carry of the 
+											 -- alu when an add is performed else 
+											 -- it's the carry of the shifter
 
+			exe_v			: out Std_Logic; --mapped to alu_v
+			exe_n			: out Std_Logic; --mapped to alu_n
+			exe_z			: out Std_Logic; --mapped to alu_z
+
+			--doesn't go through the fifo ; directly mapped with dec_exe
 			exe_dest		: out Std_Logic_Vector(3 downto 0); -- Rd destination
 			exe_wb			: out Std_Logic; -- Rd destination write back
 			exe_flag_wb		: out Std_Logic; -- CSPR modifiy
 
 	-- Mem interface
+			-- read from fifo 
 			exe_mem_adr		: out Std_Logic_Vector(31 downto 0); -- Alu res register
-			exe_mem_data	: out Std_Logic_Vector(31 downto 0);
+			exe_mem_data	: out Std_Logic_Vector(31 downto 0); 
 			exe_mem_dest	: out Std_Logic_Vector(3 downto 0);
 
-			exe_mem_lw		: out Std_Logic;
-			exe_mem_lb		: out Std_Logic;
-			exe_mem_sw		: out Std_Logic;
-			exe_mem_sb		: out Std_Logic;
+			exe_mem_lw		: out Std_Logic; 
+			exe_mem_lb		: out Std_Logic; 
+			exe_mem_sw		: out Std_Logic; 
+			exe_mem_sb		: out Std_Logic; 
 
-			exe2mem_empty	: out Std_logic;
+			exe2mem_empty	: out Std_logic; --read from fifo
 			mem_pop			: in Std_logic;
 
 	-- global interface
@@ -226,14 +238,13 @@ architecture Behavior OF exec is
 	);
 
 -- synchro
-	mem_adr <= X"00000000";
-	mem_acces <= '0';
-	exe_push <= '1';
+	mem_adr <= dec_op1 when dec_pre_index = '0' else alu_res;
+	mem_acces <= dec_mem_lw or dec_mem_lb or dec_mem_sw or dec_mem_sb; 
+	exe_push <= not mem_pop;
 
-	exe_pop	<= '0';
-
+	exe_pop	<= mem_pop ;
 -- cout
-	exe_c <= '0';
+	exe_c <= alu_c when dec_alu_cmd = "00" else shift_c;
 
 -- ALU opearandes
 
@@ -243,16 +254,13 @@ architecture Behavior OF exec is
 	
 	--op2 is shifted first and then we choose either the result or it's negation depending on the comp flag
 	op2 <=	op2_shift when dec_comp_op2 = '1' else 
-			not op2_shift when dec_comp_op2 = '0';
-		
+			not op2_shift when dec_comp_op2 = '0';	
 
 -- Loop dec
 
-	exe_dest	<= "1";
-	exe_wb <= '1';
-	exe_flag_wb <= '0';
-
-	exe_mem_data <= dec_mem_data; 
+	exe_dest	<= dec_exe_dest ;
+	exe_wb <= dec_exe_wb ;
+	exe_flag_wb <= dec_flag_wb;
 
 	--exe_res contains a bypassed value from the alu
 	exe_res <= alu_res;
