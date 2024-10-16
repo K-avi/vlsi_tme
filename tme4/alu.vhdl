@@ -49,7 +49,7 @@ begin
 	end process;
 
 	--zero flag
-	z <= '1' when not res = "00000000000000000000000000000000" else '0'; 
+	z <= '1' when res = "00000000000000000000000000000000" else '0'; 
 	--negative flag
 	n <= res(31);
 	--overflow flag
