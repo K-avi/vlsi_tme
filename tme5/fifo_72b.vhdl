@@ -24,7 +24,7 @@ END fifo_72b;
 architecture dataflow of fifo_72b is
 
 signal fifo_d	: std_logic_vector(71 downto 0);
-signal fifo_v	: std_logic;
+signal fifo_v	: std_logic; --"valide" ie pleine ou vide (validité du contenu)
 
 begin
 

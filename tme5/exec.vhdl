@@ -83,7 +83,8 @@ entity exec is
 			ck				: in Std_logic;
 			reset_n			: in Std_logic;
 			vdd				: in bit;
-			vss				: in bit);
+			vss				: in bit
+	);
 end exec;
 
 ----------------------------------------------------------------------
@@ -97,7 +98,7 @@ architecture Behavior OF exec is
 				shift_asr	: in Std_Logic;
 				shift_ror	: in Std_Logic;
 				shift_rrx	: in Std_Logic;
-				sh_val		: in Std_Logic_Vector(4 downto 0);
+				shift_val		: in Std_Logic_Vector(4 downto 0);
 
 				din			: in Std_Logic_Vector(31 downto 0);
 				cin			: in Std_Logic;
@@ -132,18 +133,16 @@ architecture Behavior OF exec is
 	component fifo_72b
 		port(
 			din			: in std_logic_vector(71 downto 0);
-			dout			: out std_logic_vector(71 downto 0);
-
+			dout		: out std_logic_vector(71 downto 0);
 			-- commands
-			push			: in std_logic;
+			push		: in std_logic;
 			pop			: in std_logic;
-
 			-- flags
-			full			: out std_logic;
-			empty			: out std_logic;
+			full		: out std_logic;
+			empty		: out std_logic;
 
 			reset_n		: in std_logic;
-			ck				: in std_logic;
+			ck			: in std_logic;
 			vdd			: in bit;
 			vss			: in bit
 		);
@@ -163,7 +162,7 @@ architecture Behavior OF exec is
 	signal mem_adr		: std_logic_vector(31 downto 0);
 
 	signal exe_push 	: std_logic;
-	signal exe2mem_full	: std_logic;
+	signal exe2mem_full	: std_logic; -- attendre ?
 	signal mem_acces	: std_logic;
 
 	begin
@@ -176,7 +175,7 @@ architecture Behavior OF exec is
 				shift_asr	=> dec_shift_asr,
 				shift_ror	=> dec_shift_ror,
 				shift_rrx	=> dec_shift_rrx,
-				sh_val		=> dec_shift_val,
+				shift_val		=> dec_shift_val,
 
 				din			=> dec_op2,
 				cin			=> dec_cy,
@@ -190,7 +189,7 @@ architecture Behavior OF exec is
 	alu_inst : alu
 	port map (	
 			op1		 => op1,
-			op2		 => op2_shift,
+			op2		 => op2,
 			cin		 => dec_alu_cy,
 
 			cmd		 => dec_alu_cmd,
@@ -237,16 +236,7 @@ architecture Behavior OF exec is
 				vss => vss
 	);
 
--- synchro
-	mem_adr <= dec_op1 when dec_pre_index = '0' else alu_res;
-	mem_acces <= dec_mem_lw or dec_mem_lb or dec_mem_sw or dec_mem_sb; 
-	exe_push <= not mem_pop;
-
-	exe_pop	<= mem_pop ;
--- cout
-	exe_c <= alu_c when dec_alu_cmd = "00" else shift_c;
-
--- ALU opearandes
+-- ALU operandes
 
 	--op1 is either the entry value or it's negation depending on the comp flag
 	op1 <=	dec_op1 when dec_comp_op1 = '1' else 
@@ -256,11 +246,39 @@ architecture Behavior OF exec is
 	op2 <=	op2_shift when dec_comp_op2 = '1' else 
 			not op2_shift when dec_comp_op2 = '0';	
 
+-- synchro
+	mem_adr <= dec_op1 when dec_pre_index = '0' else alu_res ;
+	mem_acces <= dec_mem_lw or dec_mem_lb or dec_mem_sw or dec_mem_sb ; 
+	
+
+	exe_push <= mem_acces and not exe2mem_full; -- push if not full and mem access
+	--fetch next op
+
+--Sorties de l'étage exec
+	exe_pop <= ((not dec2exe_empty and not mem_acces) or 
+			   (not dec2exe_empty and mem_acces and not exe2mem_full)) ;
+		
+		--and not exe_push; -- unsure will ask 
+		--soit on fait vers registre soit vers memoire 
+		-- si vers registre -> on sait que c fini au circle 
+		-- si destination est mem -> 
+-- cout
+	exe_c <= alu_c when dec_alu_cmd = "00" else shift_c;
+
 -- Loop dec
 
-	exe_dest	<= dec_exe_dest ;
-	exe_wb <= dec_exe_wb ;
-	exe_flag_wb <= dec_flag_wb;
+	exe_dest <= dec_exe_dest ;
+				
+
+	exe_wb <= dec_exe_wb  when 
+			 ((not dec2exe_empty and not mem_acces) or 
+			 (not dec2exe_empty and mem_acces and not exe2mem_full)) 
+			 else '0';
+
+	exe_flag_wb <= dec_flag_wb when
+				   ((not dec2exe_empty and not mem_acces) or 
+				   (not dec2exe_empty and mem_acces and not exe2mem_full)) 
+				   else '0';
 
 	--exe_res contains a bypassed value from the alu
 	exe_res <= alu_res;
