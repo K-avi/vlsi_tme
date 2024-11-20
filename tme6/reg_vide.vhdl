@@ -71,10 +71,10 @@ architecture Behavior OF Reg is
 	
 	type register_array is array(15 downto 0) of std_logic_vector(31 downto 0 );
 	signal regs : register_array ;
-	signal validity_bits : std_logic_vector(15 downto 0) ;
+	signal validity_bits : std_logic_vector(15 downto 0) := "1111111111111111" ;
 
-	signal flags_register : std_logic_vector(3 downto 0 );
-	signal flags_validity_bits : std_logic_vector(1 downto 0 );
+	signal flags_register : std_logic_vector(3 downto 0 ) := "1111" ;
+	signal flags_validity_bits : std_logic_vector(1 downto 0 ) := "11" ;
 
 
 	begin
@@ -96,6 +96,7 @@ architecture Behavior OF Reg is
 		reg_rd1 <= regs(to_integer(unsigned(radr1))); --met valeurs des registres dans ports de lecture
 		reg_rd2 <= regs(to_integer(unsigned(radr2)));
 		reg_rd3 <= regs(to_integer(unsigned(radr3)));
+
 
 		--affecte les bits de validité des ports de lecture
 		reg_v1 <= validity_bits(to_integer(unsigned(radr1)));
