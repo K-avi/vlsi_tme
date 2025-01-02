@@ -236,7 +236,7 @@ signal bl_i   : Std_Logic;
 signal blink    : Std_Logic;
 
 -- Multiple transferts
-signal mtrans_shift : Std_Logic;
+signal mtrans_shift : Std_Logic; --mtrans pas implémenté 
 
 signal mtrans_mask_shift : Std_Logic_Vector(15 downto 0); 
 signal mtrans_mask : Std_Logic_Vector(15 downto 0);
@@ -302,7 +302,7 @@ signal flag_wb		: Std_Logic;
 signal offset32	: Std_Logic_Vector(31 downto 0);
 
 -- Decod to mem via exec
-signal mem_data	: Std_Logic_Vector(31 downto 0);
+signal mem_data	: Std_Logic_Vector(31 downto 0);--??
 signal ld_dest		: Std_Logic_Vector(3 downto 0);
 signal pre_index 	: Std_logic;
 
@@ -333,21 +333,6 @@ signal alu_cmd		: Std_Logic_Vector(1 downto 0);
 type state_type is (FETCH, RUN, BRANCH, LINK, MTRANS);
 signal cur_state, next_state : state_type;
 
---transitions empruntée vers next_state
-signal t1_fetch 	: Std_logic;
-signal t2_fetch 	: Std_logic;
-signal t1_run 		: Std_logic;
-signal t2_run 		: Std_logic;
-signal t3_run 		: Std_logic;
-signal t4_run 		: Std_logic;
-signal t5_run 		: Std_logic;
-signal t6_run 		: Std_logic;
-signal t1_branch 	: Std_logic;
-signal t2_branch 	: Std_logic;
-signal t3_branch    : Std_logic;
-signal t1_mtrans 	: Std_logic;
-signal t2_mtrans 	: Std_logic;
-signal t3_mtrans    : Std_logic;
 
 signal debug_state : Std_Logic_Vector(3 downto 0) := X"0";
 
@@ -575,13 +560,13 @@ begin
 
 	--t3_run = 1 si le prédicat est vrai et que l'instruction doit être executée 
 	--bit 20 : load/store , bit 22 : byte/word
-	ldr_i 	<= '1' when cur_state = RUN and t3_run = '1' and trans_t ='1' and if_ir(20) = '1' and if_ir(22) = '0'
+	ldr_i 	<= '1'when trans_t ='1' and if_ir(20) = '1' and if_ir(22) = '0'
 				else '0';
-	str_i 	<= '1' when cur_state = RUN and t3_run = '1' and trans_t ='1' and if_ir(20) = '0' and if_ir(22) = '0'
+	str_i 	<= '1' when trans_t ='1' and if_ir(20) = '0' and if_ir(22) = '0'
 				else '0' ;
-	ldrb_i 	<= '1' when cur_state = RUN and t3_run = '1' and trans_t ='1' and if_ir(20) = '1' and if_ir(22) = '1'
+	ldrb_i 	<= '1' when trans_t ='1' and if_ir(20) = '1' and if_ir(22) = '1'
 				else '0';
-	strb_i 	<= '1' when cur_state = RUN and t3_run = '1' and trans_t ='1' and if_ir(20) = '0' and if_ir(22) = '1'
+	strb_i 	<= '1' when trans_t ='1' and if_ir(20) = '0' and if_ir(22) = '1'
 				else '0';
 
 -- mtrans instruction
@@ -736,7 +721,7 @@ begin
 				 --et op2 de trans est 1 immédiat
 				 rdata3(4 downto 0) when regop_t = '1' and if_ir(25) = '0' and if_ir(4) = '1' else
 				 --lsb du registre contenu dans Rs si if_ir(4) est à 1
-				 "0010" when branch_t = '1' else --ajoute 4 à PC  ??? (laissé car donné) A VERIFIER
+				 "00010" when branch_t = '1' else --ajoute 4 à PC  ??? (laissé car donné) A VERIFIER
 	             "00000";
 
 -- Alu operand selection
@@ -852,7 +837,7 @@ begin
 			next_state <= FETCH;
 		end if;
 	
-	when RUN =>when RUN =>
+	when RUN =>
 	--- DEBUG
 	debug_state <= x"1";
 	if (branch_t = '1' and bl_i = '1') then
