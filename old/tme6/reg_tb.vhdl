@@ -136,77 +136,79 @@ begin
     process  
     begin
 
-       -- reset_n <= '1' ; 
-      --  wait on reset_n ; 
+        reset_n <= '1' ; 
+        wait on reset_n ; 
 
-               -- invalide les registres 8 et 12 pour test
-        --inval_adr1 <= "0001";
-        --inval1 <= '1';
+        -- met les registres 1 et 15 a valide
+        inval_adr1 <= "0001";
+        inval1 <= '1';
 
-        --inval_adr2 <= "1111";
-        --inval2 <= '1';
+        inval_adr2 <= "1111";
+        inval2 <= '1';
 
-        --wait on inval_adr1 ;
+        wait on inval_adr1 ;
        
 
         -- write valeur dans reg1
         
-        --wdata1 <= x"00000000";
-        --wadr1 <= "0001";
-        --wen1 <= '1'; --on write
+        wdata1 <= x"00000000";
+        wadr1 <= "0001";
+        wen1 <= '1'; --on write
 
-        -- write valeur dans reg15
-        --wdata2 <= x"00000010";
-        --wadr2 <= "1111"; 
-        --wen2 <= '1'; -- on write pas
+         --write valeur dans reg15
+        wdata2 <= x"00000010";
+        wadr2 <= "1111"; 
+        wen2 <= '1';  --on write pas
 
-        -- set tout les flags à 0 et le wb a true
-       -- wcry <= '0';
-        --wzero <= '0';
-       -- wneg <= '0';
-      --  wovr <= '0';
-     --   cspr_wb <= '1';
+         --set tout les flags à 0 et le wb a true
+        wcry <= '0';
+        wzero <= '0';
+        wneg <= '0';
+        wovr <= '0';
+        cspr_wb <= '1';
 
         -- lis les registres 0, 1 et 15
-   --     radr1 <= "0001";
- --       radr2 <= "0001";
---        radr3 <= "1111";
+        radr1 <= "0001";
+        radr2 <= "0001";
+        radr3 <= "1111";
 
 
         -- invalide les registres 8 et 12 pour test
-        --inval_adr1 <= "1000";
-        ---inval1 <= '0';
+        inval_adr1 <= "1000";
+        inval1 <= '0';
 
-        --inval_adr2 <= "1100";
-        --inval2 <= '0';
+        inval_adr2 <= "1100";
+        inval2 <= '0';
 
         -- n'invalide pas les flags
-        --inval_czn <= '0';
-        --inval_ovr <= '0';
+        inval_czn <= '0';
+        inval_ovr <= '0';
 
-        --incrément pc true
-        --inc_pc <= '1';
+       -- incrément pc true
+        inc_pc <= '1';
 
-        --ck <= '0';
-        --vdd <= '1';
-        --vss <= '0';
+        ck <= '0';
+        vdd <= '1';
+        vss <= '0';
          
-        --report "qqqqbalbalbl";
+        report "qqqqbalbalbl";
         --wait on ;
-        --wait on radr3;
-        --report "radr 3 is : " & integer'image(to_integer(unsigned(radr3)));
+        wait on radr3;
+        report "radr 3 is : " & integer'image(to_integer(unsigned(radr3)));
 
   
 
-        --wait on reg_rd3 ;
+        wait for 10 ns;
         
         report "here" ;
 
-       -- assert reg_rd3(0) = 'U' report "uninit" ; 
-       -- assert reg_rd3(0) = '0' report "0 val" ; 
+        assert reg_rd3(0) = '1' report "1 val" ;
+        assert reg_rd3(0) = 'U' report "uninit" ; 
+        assert reg_rd3(0) = '0' report "0 val" ; 
         
         --assert reg_rd3 = x"00000018" report ":((((((" severity error ; 
-        --assert reg_rd1 = x"0"  report "read rd1 wrong L" severity error ; 
+        assert reg_rd1(0) = '0'  report "read rd1 wrong L" severity error ; 
+        report "reg_rd1 1 is : " & integer'image(to_integer(unsigned(reg_rd1)));
         --assert reg_rd2 = 
 
 wait;
